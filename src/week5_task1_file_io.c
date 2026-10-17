@@ -1,11 +1,12 @@
-// week5_task1_file_io.c
-// Name: ________  Surname: ________  Student ID: ________
-//
-// Task 1: Read and write data from text files
-// Week 5 – Files & Modular Programming
-// TODO: Fill in the missing parts marked below.
-//
-// Build: make lab5   Run: ./bin/week5_task1_file_io
+/*
+ * week5_task1_file_io.c
+ * Name: Ziya  Surname: Pirizade  Student ID: 251ADB128
+ *
+ * Task 1: Read and write data from text files
+ * Week 5 – Files & Modular Programming
+ *
+ * Build: make lab5   Run: ./bin/week5_task1_file_io
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,22 +20,55 @@ int main(int argc, char *argv[]) {
     char line[LINE_LEN];
     int line_count = 0;
 
-    // BONUS: if a file name was given on the command line (argc > 1), use argv[1] instead.
+    if (argc > 1) {
+        filename = argv[1];
+    }
 
-    // TODO: 1. Print "Writing lines to <filename>..." and open the file for writing (mode "w")
-    // TODO: 2. Check that fp is not NULL. If it is: perror(filename); return EXIT_FAILURE;
-    // TODO: 3. Write 2–3 lines of text to the file using fprintf()
-    // TODO: 4. Close the file with fclose()
+    printf("Writing lines to %s...\n", filename);
 
-    // TODO: 5. Open the file again for reading (mode "r") and check for NULL again
-    // TODO: 6. Print "Reading contents:" and use fgets() in a loop to print each line
-    //          (BONUS: count the lines in line_count)
-    // TODO: 7. Close the file
+    fp = fopen(filename, "w");
+    if (fp == NULL) {
+        perror(filename);
+        return EXIT_FAILURE;
+    }
 
-    // BONUS: printf("Lines read: %d\n", line_count);
+    if (fprintf(fp, "Hello, file I/O in C!\n") < 0 ||
+        fprintf(fp, "This is another line.\n") < 0) {
+        perror(filename);
+        fclose(fp);
+        return EXIT_FAILURE;
+    }
 
-    // Remove this line once you use these variables:
-    (void)argc; (void)argv; (void)fp; (void)filename; (void)line; (void)line_count;
+    if (fclose(fp) != 0) {
+        perror(filename);
+        return EXIT_FAILURE;
+    }
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        perror(filename);
+        return EXIT_FAILURE;
+    }
+
+    printf("Reading contents:\n");
+
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        printf("%s", line);
+        line_count++;
+    }
+
+    if (ferror(fp)) {
+        perror(filename);
+        fclose(fp);
+        return EXIT_FAILURE;
+    }
+
+    if (fclose(fp) != 0) {
+        perror(filename);
+        return EXIT_FAILURE;
+    }
+
+    printf("Lines read: %d\n", line_count);
 
     return EXIT_SUCCESS;
 }
