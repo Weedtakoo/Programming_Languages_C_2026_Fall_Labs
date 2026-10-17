@@ -1,63 +1,75 @@
-// week5_task2_struct_save_load.c
-// Name: ________  Surname: ________  Student ID: ________
-//
-// Task 2: Save and load structured records from a file
-// Week 5 – Files & Modular Programming
-// TODO: Complete the function implementations and the file handling logic.
-//
-// Build: make lab5   Run: ./bin/week5_task2_struct_save_load
+
+/*
+ * week5_task1_file_io.c
+ * Name: Ziya  Surname: Pirizade  Student ID: 251ADB128
+ *
+ * Task 1: Read and write data from text files
+ * Week 5 – Files & Modular Programming
+ *
+ * Build: make lab5   Run: ./bin/week5_task1_file_io
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#define MAX_NAME_LEN 50
+#define DEFAULT_FILENAME "data.txt"
+#define LINE_LEN 256
 
-typedef struct Student {
-    char name[MAX_NAME_LEN];
-    int age;
-    float gpa;
-} Student;
+int main(int argc, char *argv[]) {
+    FILE *fp = NULL;
+    const char *filename = DEFAULT_FILENAME;
+    char line[LINE_LEN];
+    int line_count = 0;
 
-// Function prototypes (do not change these signatures – the autograder calls them directly)
-int save_student(const Student *s, const char *filename);  // 0 on success, -1 on error
-int load_student(const char *filename, Student *out);      // 0 on success, -1 on error
+    if (argc > 1) {
+        filename = argv[1];
+    }
 
-int main(void) {
-    Student s1 = {0};
-    strcpy(s1.name, "Alice");
-    s1.age = 21;
-    s1.gpa = 3.75f;
+    printf("Writing lines to %s...\n", filename);
 
-    Student loaded = {0};
-    const char *filename = "student.txt";
+    fp = fopen(filename, "w");
+    if (fp == NULL) {
+        perror(filename);
+        return EXIT_FAILURE;
+    }
 
-    printf("Saving student to file...\n");
-    // TODO: Call save_student(&s1, filename). If it fails, print an error and return EXIT_FAILURE.
+    if (fprintf(fp, "Hello, file I/O in C!\n") < 0 ||
+        fprintf(fp, "This is another line.\n") < 0) {
+        perror(filename);
+        fclose(fp);
+        return EXIT_FAILURE;
+    }
 
-    printf("Loading student from file...\n");
-    // TODO: Call load_student(filename, &loaded). If it fails, print an error and return EXIT_FAILURE.
+    if (fclose(fp) != 0) {
+        perror(filename);
+        return EXIT_FAILURE;
+    }
 
-    // TODO: Print the loaded data in exactly this format:
-    //       printf("Loaded student: %s, %d, GPA %.2f\n", ...);
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        perror(filename);
+        return EXIT_FAILURE;
+    }
 
-    (void)filename; (void)loaded;  // remove this line once you use these variables
+    printf("Reading contents:\n");
+
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        printf("%s", line);
+        line_count++;
+    }
+
+    if (ferror(fp)) {
+        perror(filename);
+        fclose(fp);
+        return EXIT_FAILURE;
+    }
+
+    if (fclose(fp) != 0) {
+        perror(filename);
+        return EXIT_FAILURE;
+    }
+
+    printf("Lines read: %d\n", line_count);
+
     return EXIT_SUCCESS;
-}
-
-// TODO: Implement save_student()
-// Open the file for writing ("w"), return -1 if fopen() fails,
-// write "name age gpa" on one line with fprintf(), close the file and return 0.
-int save_student(const Student *s, const char *filename) {
-    (void)s; (void)filename;  // remove this line when you implement the function
-    return -1;
-}
-
-// TODO: Implement load_student()
-// Open the file for reading ("r"), return -1 if fopen() fails,
-// read the three fields with fscanf(fp, "%49s %d %f", ...) and check that it returned 3,
-// close the file in every case, and return 0 on success / -1 on failure.
-int load_student(const char *filename, Student *out) {
-    (void)filename; (void)out;  // remove this line when you implement the function
-    return -1;
 }
